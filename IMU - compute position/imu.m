@@ -1,6 +1,6 @@
 clear variables
 
-recording_time=5; %seconds
+recording_time=20; %seconds
 sample_rate=200;    %max 200
 samples_in_package=500; %max 500
 fusion_decimation_factor=2;
@@ -32,9 +32,9 @@ for i = (1:num_of_packets)
 end
 
 %% POSTPROCESSING
-dataGyro(:,1)=dataGyro(:,1)+0.0822;
-dataGyro(:,2)=dataGyro(:,2)-0.0435;
-dataGyro(:,3)=dataGyro(:,3)+0.0118;
+dataGyro(:,1)=dataGyro(:,1)+0.0572;
+dataGyro(:,2)=dataGyro(:,2)+0.0087;
+dataGyro(:,3)=dataGyro(:,3)+0.0504;
 
 plot(dataTimestamps,dataAcc);
 title('Acc')
@@ -47,25 +47,32 @@ title('Gyro')
 legend('X', 'Y', 'Z')
 xlabel('Time')
 ylabel('Angular velocity (rad/s)')
+save('data_imu_turbula_dynamic3.mat','dataTimestamps','dataAcc','dataGyro');
 
 %% DATA FUSION
-fuse = imufilter('SampleRate',sample_rate,'DecimationFactor',fusion_decimation_factor);
+fuse = imufilter('SampleRate',sample_rate,'DecimationFactor',fusion_decimation_factor,'OrientationFormat','Rotation matrix');
 
-q = fuse(dataAcc,dataGyro);
+rot_matrix = fuse(dataAcc,dataGyro);
 
 figure;
 timesAfterFuse=dataTimestamps(1:fusion_decimation_factor:end);
-plot(timesAfterFuse,eulerd(q,'ZYX','frame'))
+plot(timesAfterFuse,rotm2eul(rot_matrix))
 title('Orientation Estimate')
 legend('Z-axis', 'Y-axis', 'X-axis')
 xlabel('Time')
 ylabel('Rotation (degrees)')
 
+%% TUNING
+% 
+% reset(fuse);
+% cfg1 = tunerconfig("imufilter","MaxIterations",20,"ObjectiveLimit",0.0001);
+% tune(fuse,sensorData,groundTruth(1:10:end,:),cfg1);
+
 %% POSE PLOT
 figure;
 pp = poseplot;
-for i = 1:size(q,1)
-    set(pp, "Orientation", q(i))
+for i = 1:size(rot_matrix,3)
+    set(pp, "Orientation", rot_matrix(:,:,i))
     drawnow limitrate
     pause(0.01)
 end
