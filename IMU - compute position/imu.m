@@ -47,7 +47,7 @@ title('Gyro')
 legend('X', 'Y', 'Z')
 xlabel('Time')
 ylabel('Angular velocity (rad/s)')
-save('data_imu_turbula_dynamic3.mat','dataTimestamps','dataAcc','dataGyro');
+save('data_imu.mat','dataTimestamps','dataAcc','dataGyro');
 
 %% DATA FUSION
 fuse = imufilter('SampleRate',sample_rate,'DecimationFactor',fusion_decimation_factor,'OrientationFormat','Rotation matrix');
