@@ -18,8 +18,10 @@ figure( 'Name', 'Fitting curve' );
 h = plot( fitresult, xData, yData );
 % legend( h, 'gg vs. ttsec', 'untitled fit 1', 'Location', 'NorthEast', 'Interpreter', 'none' );
 % Label axes
-xlabel( 'Time', 'Interpreter', 'none' );
-ylabel( 'Signal', 'Interpreter', 'none' );
+xlabel( 'Time [s]', 'Interpreter', 'none' );
+ylabel( 'AngularVelocity [rad/s]', 'Interpreter', 'none' );
+title('Fitting curve');
+legend('Data', 'Fitted curve');
 grid on
 
 
