@@ -48,32 +48,3 @@ legend('X', 'Y', 'Z')
 xlabel('Time')
 ylabel('Angular velocity (rad/s)')
 save('data_imu.mat','dataTimestamps','dataAcc','dataGyro');
-
-%% DATA FUSION
-fuse = imufilter('SampleRate',sample_rate,'DecimationFactor',fusion_decimation_factor,'OrientationFormat','Rotation matrix');
-
-rot_matrix = fuse(dataAcc,dataGyro);
-
-figure;
-timesAfterFuse=dataTimestamps(1:fusion_decimation_factor:end);
-plot(timesAfterFuse,rotm2eul(rot_matrix))
-title('Orientation Estimate')
-legend('Z-axis', 'Y-axis', 'X-axis')
-xlabel('Time')
-ylabel('Rotation (degrees)')
-
-%% TUNING
-% 
-% reset(fuse);
-% cfg1 = tunerconfig("imufilter","MaxIterations",20,"ObjectiveLimit",0.0001);
-% tune(fuse,sensorData,groundTruth(1:10:end,:),cfg1);
-
-%% POSE PLOT
-figure;
-pp = poseplot;
-for i = 1:size(rot_matrix,3)
-    set(pp, "Orientation", rot_matrix(:,:,i))
-    drawnow limitrate
-    pause(0.01)
-end
-    
